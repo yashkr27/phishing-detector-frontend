@@ -10,14 +10,17 @@
   <!-- Inter (right panel only) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- System header divider -->
-<div class="header-line"></div>
+  <div class="header-line"></div>
 
-<div class="page">
+  <div class="page">
 
     <!-- LEFT PANEL -->
     <div class="left-panel">
@@ -28,8 +31,17 @@
       </p>
 
       <div class="input-group">
-        <input type="text" id="urlInput" placeholder="Paste a URL to analyze" />
-        <button id="checkBtn">Analyze</button>
+        <input type="text" id="urlInput" placeholder="Paste a URL to analyze (e.g., https://example.com)" />
+        <button id="checkBtn">
+          <span class="btn-text">Analyze</span>
+          <span class="loading hidden">
+            <i class="fas fa-spinner fa-spin"></i> Analyzing...
+          </span>
+        </button>
+      </div>
+
+      <div id="validationError" class="validation-error hidden">
+        <i class="fas fa-exclamation-circle"></i> Please enter a URL to analyze
       </div>
 
       <div class="intel-strip">
@@ -37,7 +49,11 @@
         <span id="intelText"></span>
       </div>
 
-      <div id="result" class="hidden"></div>
+      <div id="result" class="hidden">
+        <div class="result-icon"></div>
+        <div class="result-text"></div>
+        <div class="result-subtext"></div>
+      </div>
     </div>
 
     <!-- RIGHT PANEL -->
@@ -51,7 +67,6 @@
           <li><strong>Lookalike domains</strong> — Slight misspellings mimic trusted websites.</li>
           <li><strong>Malicious attachments</strong> — Infected files deliver malware or spyware.</li>
           <li><strong>QR-code phishing</strong> — Malicious QR codes redirect users to fake sites.</li>
-          <li><strong>Shortened URL abuse</strong> — Hidden destinations are used to evade detection.</li>
         </ul>
       </div>
 
@@ -74,8 +89,7 @@
           <li><strong>Do not scan unknown QR codes</strong> — QR links can open unsafe websites.</li>
           <li><strong>Enable two-factor authentication</strong> — Adds protection if credentials are leaked.</li>
           <li><strong>Check HTTPS and spelling</strong> — Secure connections can still be fraudulent.</li>
-          <li><strong>Avoid unexpected attachments</strong> — Unsolicited files are common malware vectors.</li>
-        </ul>
+          </ul>
       </div>
 
     </div>
