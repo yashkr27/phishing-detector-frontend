@@ -3,28 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <title>Phishing Link Detector</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Space Grotesk -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Inter (right panel only) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="layout">
-    <h1>Detect phishing<br>before it attacks you.</h1>
+  <!-- System header divider -->
+<div class="header-line"></div>
 
-    <p class="subtitle">
-      Real-time phishing link analysis powered by machine learning.
-    </p>
+<div class="page">
 
-    <div class="input-group">
-      <input
-        type="text"
-        id="urlInput"
-        placeholder="Paste a URL to analyze"
-      />
-      <button id="checkBtn">Analyze</button>
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <h1>Detect phishing<br>before it attacks you.</h1>
+
+      <p class="subtitle">
+        Real-time phishing link analysis powered by machine learning.
+      </p>
+
+      <div class="input-group">
+        <input type="text" id="urlInput" placeholder="Paste a URL to analyze" />
+        <button id="checkBtn">Analyze</button>
+      </div>
+
+      <div class="intel-strip">
+        <span class="intel-label">LIVE THREAT INTEL</span>
+        <span id="intelText"></span>
+      </div>
+
+      <div id="result" class="hidden"></div>
     </div>
 
-    <div id="result" class="hidden"></div>
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <div class="info-block active">
+        <div class="panel-title">COMMON PHISHING TECHNIQUES</div>
+        <ul>
+          <li><strong>Email spoofing</strong> — Attackers forge sender addresses to appear legitimate.</li>
+          <li><strong>Credential harvesting</strong> — Fake login pages steal usernames and passwords.</li>
+          <li><strong>Lookalike domains</strong> — Slight misspellings mimic trusted websites.</li>
+          <li><strong>Malicious attachments</strong> — Infected files deliver malware or spyware.</li>
+          <li><strong>QR-code phishing</strong> — Malicious QR codes redirect users to fake sites.</li>
+          <li><strong>Shortened URL abuse</strong> — Hidden destinations are used to evade detection.</li>
+        </ul>
+      </div>
+
+      <div class="info-block">
+        <div class="panel-title">WELL-KNOWN PHISHING ATTACKS</div>
+        <ul>
+          <li><strong>Google Docs phishing</strong> — Fake document invites spread via trusted contacts.</li>
+          <li><strong>PayPal credential scams</strong> — Cloned PayPal pages captured login details.</li>
+          <li><strong>COVID-19 themed phishing</strong> — Public fear was exploited using fake updates.</li>
+          <li><strong>Facebook login clones</strong> — Replica pages harvested user credentials.</li>
+          <li><strong>Microsoft 365 phishing</strong> — Spoofed security alerts targeted enterprises.</li>
+        </ul>
+      </div>
+
+      <div class="info-block">
+        <div class="panel-title">HOW TO STAY SAFE FROM PHISHING</div>
+        <ul>
+          <li><strong>Verify sender and domain</strong> — Always inspect the full email and URL.</li>
+          <li><strong>Avoid shortened links</strong> — Hidden URLs often lead to malicious pages.</li>
+          <li><strong>Do not scan unknown QR codes</strong> — QR links can open unsafe websites.</li>
+          <li><strong>Enable two-factor authentication</strong> — Adds protection if credentials are leaked.</li>
+          <li><strong>Check HTTPS and spelling</strong> — Secure connections can still be fraudulent.</li>
+          <li><strong>Avoid unexpected attachments</strong> — Unsolicited files are common malware vectors.</li>
+        </ul>
+      </div>
+
+    </div>
+
   </div>
 
   <script src="script.js"></script>
