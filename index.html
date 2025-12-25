@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Phishing Link Detector</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>Phishing Link Detector</h1>
+  <div class="layout">
+    <h1>Detect phishing<br>before it attacks you.</h1>
 
-  <input
-    type="text"
-    id="urlInput"
-    placeholder="Enter URL to check"
-  />
+    <p class="subtitle">
+      Real-time phishing link analysis powered by machine learning.
+    </p>
 
-  <button id="checkBtn">Check URL</button>
+    <div class="input-group">
+      <input
+        type="text"
+        id="urlInput"
+        placeholder="Paste a URL to analyze"
+      />
+      <button id="checkBtn">Analyze</button>
+    </div>
 
-  <p id="status"></p>
+    <div id="result" class="hidden"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
