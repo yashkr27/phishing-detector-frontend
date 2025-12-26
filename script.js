@@ -44,13 +44,13 @@ const loading = document.querySelector(".loading");
 
 // Remove validation error when user starts typing
 urlInput.addEventListener("input", () => {
-  if (validationError.classList.contains("hidden") === false) {
+  if (!validationError.classList.contains("hidden")) {
     validationError.classList.add("hidden");
     urlInput.classList.remove("shake");
   }
 });
 
-// Validate URL format
+// Proper URL validation
 function isValidUrl(string) {
   try {
     new URL(string);
@@ -65,118 +65,97 @@ function showValidationError(message) {
   validationError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
   validationError.classList.remove("hidden");
   urlInput.classList.add("shake");
-  
-  // Remove shake animation after it completes
+
   setTimeout(() => {
     urlInput.classList.remove("shake");
   }, 600);
 }
 
-// Simulate analysis (replace with actual API call)
-function analyzeUrl(url) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Mock analysis - in reality, this would be an API call
-      const isPhishing = Math.random() < 0.5;
-      const confidence = Math.floor(Math.random() * 30) + 70; // 70-100%
-      
-      resolve({
-        isPhishing,
-        confidence,
-        reasons: isPhishing ? [
-          "Suspicious domain structure",
-          "Recently registered domain",
-          "Matches known phishing patterns"
-        ] : [
-          "Valid SSL certificate",
-          "Domain age > 1 year",
-          "No known phishing reports"
-        ]
-      });
-    }, 1500); // Simulate network delay
+/* ---------------- FASTAPI CALL ---------------- */
+
+async function analyzeUrl(url) {
+  const response = await fetch("http://localhost:8000/predict", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ url })
   });
+
+  if (!response.ok) {
+    throw new Error("Backend error");
+  }
+
+  const data = await response.json();
+
+  return {
+    isPhishing: data.label === "phishing",
+    confidence: Math.round(data.confidence * 100),
+    reasons: [] // backend can extend later
+  };
 }
 
-// Handle analysis button click
+/* ---------------- BUTTON HANDLER ---------------- */
+
 checkBtn.addEventListener("click", async () => {
   const url = urlInput.value.trim();
-  
-  // Input validation
+
   if (!url) {
     showValidationError("Please enter a URL to analyze");
     return;
   }
-  
-  // Basic URL format validation
-  if (!url.includes(".") || url.length < 5) {
+
+  if (!isValidUrl(url)) {
     showValidationError("Please enter a valid URL (e.g., https://example.com)");
     return;
   }
-  
-  // Show loading state
+
   btnText.classList.add("hidden");
   loading.classList.remove("hidden");
   checkBtn.disabled = true;
-  
+
   try {
-    // Perform analysis
     const analysis = await analyzeUrl(url);
-    
-    // Display result
+
     result.className = analysis.isPhishing ? "phishing" : "safe";
     result.classList.remove("hidden");
-    
-    // Set result content
+
     const resultText = result.querySelector(".result-text");
     const resultSubtext = result.querySelector(".result-subtext");
-    
-    if (analysis.isPhishing) {
-      resultText.textContent = "PHISHING LINK DETECTED";
-      resultSubtext.innerHTML = `
-        Confidence: ${analysis.confidence}%<br>
-        ${analysis.reasons.slice(0, 2).join(" • ")}
-      `;
-    } else {
-      resultText.textContent = "LINK APPEARS SAFE";
-      resultSubtext.innerHTML = `
-        Confidence: ${analysis.confidence}%<br>
-        ${analysis.reasons.slice(0, 2).join(" • ")}
-      `;
-    }
-    
+
+    resultText.textContent = analysis.isPhishing
+      ? "PHISHING LINK DETECTED"
+      : "LINK APPEARS SAFE";
+
+    resultSubtext.innerHTML = `
+      Confidence: ${analysis.confidence}%<br>
+      ${analysis.reasons.length ? analysis.reasons.slice(0, 2).join(" • ") : ""}
+    `;
   } catch (error) {
-    // Handle errors
     result.className = "phishing";
     result.classList.remove("hidden");
     result.querySelector(".result-text").textContent = "ANALYSIS ERROR";
-    result.querySelector(".result-subtext").textContent = 
+    result.querySelector(".result-subtext").textContent =
       "Unable to analyze the URL. Please try again.";
   } finally {
-    // Reset button state
     btnText.classList.remove("hidden");
     loading.classList.add("hidden");
     checkBtn.disabled = false;
   }
 });
 
-// Allow Enter key to trigger analysis
+// Enter key support
 urlInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     checkBtn.click();
   }
 });
 
-// Add focus state for better UX
+// Focus styling
 urlInput.addEventListener("focus", () => {
   urlInput.style.borderColor = "#00c8ff";
 });
 
 urlInput.addEventListener("blur", () => {
   urlInput.style.borderColor = "#2a2f36";
-});
-
-// Initialize with a sample URL for demo purposes
-window.addEventListener("DOMContentLoaded", () => {
-  // Uncomment to pre-fill with a sample URL
-  // urlInput.value = "https://example.com";
 });
