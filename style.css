@@ -201,6 +201,11 @@ button:active {
   white-space: nowrap;
 }
 
+#intelText {
+  transition: opacity 0.5s ease;
+  opacity: 0.6;
+}
+
 /* ================= RESULT ================= */
 
 #result {

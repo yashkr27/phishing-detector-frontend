@@ -1,0 +1,136 @@
+# 🔍 Phishing Detector Frontend — Sanity Check Report
+
+**Date:** 2026-03-01  
+**Scope:** Production readiness & fast CORS review
+
+---
+
+## 🚨 CRITICAL: Issues That Will Break in Production
+
+### 1. Hardcoded `localhost` API endpoint
+**File:** [script.js](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detector-frontend/phishing-detector-frontend/script.js#L4)
+
+```js
+const response = await fetch("http://127.0.0.1:8003/predict", { ... });
+```
+
+- This will **fail immediately** in production — the browser will try to call `127.0.0.1:8003` on the user's own machine.
+- This **also triggers a mixed-content block** if the frontend is served over HTTPS (browser refuses `http://` fetch from an `https://` page).
+
+> [!CAUTION]
+> **Fix:** Use a relative URL or environment-driven config:
+> ```js
+> const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+>   ? "http://127.0.0.1:8003"
+>   : "https://your-production-api.example.com";
+> ```
+
+---
+
+### 2. CORS whitelist is `localhost`-only (backend)
+**File:** [main.py](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detection-api/phishing-detection-api/app/main.py#L15-L24)
+
+```python
+allow_origins=[
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+],
+```
+
+- The backend will **reject** requests from any production domain.
+- "Fast CORS" = the browser sends a **preflight `OPTIONS`** request first; if the origin isn't whitelisted, the actual `POST` never fires.
+
+> [!CAUTION]
+> **Fix:** Add your production frontend origin:
+> ```python
+> allow_origins=[
+>     "http://localhost:5500",
+>     "http://127.0.0.1:5500",
+>     "https://your-production-frontend.example.com",
+> ],
+> ```
+> **Never** use `allow_origins=["*"]` with `allow_credentials=True` — browsers block that combo.
+
+---
+
+## ⚠️ HIGH: Issues That Degrade Experience
+
+### 3. No `<meta name="viewport">` tag
+**File:** [index.html](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detector-frontend/phishing-detector-frontend/index.html#L3-L6)
+
+- Despite having responsive CSS breakpoints (`768px`, `480px`), **mobile browsers will render the page at desktop zoom** without:
+  ```html
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  ```
+
+### 4. Missing `<meta name="description">` (SEO)
+- No meta description means search engines will auto-generate a snippet. For a public-facing tool this is a missed opportunity.
+
+### 5. Validation error is never cleared
+**File:** [script.js](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detector-frontend/phishing-detector-frontend/script.js#L34-L40)
+
+- Once `validationError` is shown (empty URL), it stays even after the user types and clicks Analyze with a valid URL. The `click` handler only shows it but never hides it.
+
+### 6. `Enter` key doesn't submit
+- Users expect `Enter` to trigger analysis. Currently only the button click is wired up.
+
+---
+
+## 🟡 MEDIUM: Polish & Robustness
+
+### 7. No URL format validation
+- Any string is sent to the backend — including things like `hello` or `   `. At minimum a basic regex check avoids unnecessary API calls.
+
+### 8. `result.className =` wipes all classes
+**File:** [script.js](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detector-frontend/phishing-detector-frontend/script.js#L49)
+
+```js
+result.className = analysis.isPhishing ? "phishing" : "safe";
+```
+- This nukes every class on `#result`, then re-adds via `classList.remove("hidden")` on the next line. It works *by accident* but is fragile — any future class added to `#result` will be silently dropped.
+
+### 9. Right-panel carousel has no rotation logic
+- Three `.info-block` elements exist with `position: absolute` and only the first has `.active`. There's no JS to rotate them, so two panels are permanently invisible.
+
+### 10. Intel strip `#intelText` is always empty
+```html
+<span id="intelText"></span>
+```
+- No JS populates this. It renders as an empty strip with just the label "LIVE THREAT INTEL".
+
+---
+
+## ✅ What's Good
+
+| Aspect | Status |
+|--------|--------|
+| Responsive CSS breakpoints | ✅ Present (needs viewport meta) |
+| `prefers-reduced-motion` | ✅ Handled |
+| Loading state on button | ✅ Spinner + disabled |
+| Error handling in fetch | ✅ try/catch with user-friendly message |
+| Font loading (Google Fonts) | ✅ Proper `display=swap` |
+| Clean semantic HTML | ✅ |
+
+---
+
+## 🛠️ Recommended Fixes Summary
+
+| # | Severity | Fix |
+|---|----------|-----|
+| 1 | 🚨 Critical | Make API URL configurable / environment-aware |
+| 2 | 🚨 Critical | Add prod origin to CORS whitelist |
+| 3 | ⚠️ High | Add `<meta name="viewport">` |
+| 4 | ⚠️ High | Add `<meta name="description">` |
+| 5 | ⚠️ High | Clear validation error on valid submit |
+| 6 | ⚠️ High | Add `Enter` key listener |
+| 7 | 🟡 Medium | Add basic URL format validation |
+| 8 | 🟡 Medium | Use `classList` instead of `className =` |
+| 9 | 🟡 Medium | Add info-block rotation JS or show all blocks |
+| 10 | 🟡 Medium | Populate or remove intel strip |
+
+---
+
+> [!IMPORTANT]
+> **Items 1 & 2 are production blockers.** The frontend *cannot* talk to the backend in production with the current setup — the API URL is hardcoded to localhost and CORS only allows localhost origins.
+
+Want me to go ahead and fix these?
