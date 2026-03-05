@@ -11,7 +11,7 @@
 **File:** [script.js](file:///c:/Users/USER/Desktop/Phishing_Detector/phishing-detector-frontend/phishing-detector-frontend/script.js#L4)
 
 ```js
-const response = await fetch("http://127.0.0.1:8003/predict", { ... });
+const response = await fetch("http://127.0.0.1:8001/predict", { ... });
 ```
 
 - This will **fail immediately** in production — the browser will try to call `127.0.0.1:8003` on the user's own machine.

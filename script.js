@@ -1,8 +1,8 @@
 /* ---------------- CONFIG ---------------- */
 
-const API_ENDPOINT = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://127.0.0.1:8000/predict"
-  : "https://your-production-api.example.com/predict";
+// Use the production URL for both local and live entornos to avoid local backend dependency
+const API_ENDPOINT = "https://phishing-detection-api-n362.onrender.com/predict";
+// const API_ENDPOINT = "http://127.0.0.1:8000/predict"; // For local debugging with a running API
 
 /* ---------------- FASTAPI CALL ---------------- */
 
@@ -111,7 +111,7 @@ const handleAnalysis = async () => {
     const analysis = await analyzeUrl(url);
 
     // Set classes carefully
-    result.classList.remove("hidden", "phishing", "safe");
+    result.classList.remove("hidden", "phishing", "safe", "error");
     result.classList.add(analysis.isPhishing ? "phishing" : "safe");
 
     result.querySelector(".result-text").textContent =
@@ -121,11 +121,11 @@ const handleAnalysis = async () => {
       `Confidence: ${analysis.confidence}%`;
 
   } catch (err) {
-    result.classList.remove("hidden", "safe");
-    result.classList.add("phishing");
+    result.classList.remove("hidden", "safe", "phishing");
+    result.classList.add("error");
     result.querySelector(".result-text").textContent = "ANALYSIS ERROR";
     result.querySelector(".result-subtext").textContent =
-      "Unable to analyze the URL. Please try again.";
+      "Unable to analyze the URL. Please check your connection or try again later.";
   } finally {
     btnText.classList.remove("hidden");
     loading.classList.add("hidden");
