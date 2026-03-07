@@ -52,6 +52,14 @@ const infoBlocks = document.querySelectorAll(".info-block");
 
 /* ---------------- HELPERS ---------------- */
 
+function normalizeUrl(string) {
+  // If input has no protocol, prepend https://
+  if (!/^https?:\/\//i.test(string)) {
+    return "https://" + string;
+  }
+  return string;
+}
+
 function isValidUrl(string) {
   try {
     const url = new URL(string);
@@ -95,7 +103,8 @@ function rotateCarousel() {
 /* ---------------- HANDLERS ---------------- */
 
 const handleAnalysis = async () => {
-  const url = urlInput.value.trim();
+  let url = normalizeUrl(urlInput.value.trim());
+  urlInput.value = url; // Show normalized URL in the input box
 
   // Reset UI
   validationError.classList.add("hidden");
