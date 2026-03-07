@@ -21,9 +21,20 @@ async function analyzeUrl(url) {
 
   const data = await response.json();
 
+  const isPhishing = data.label === "phishing";
+
+  // data.confidence is the raw phishing probability (0.0 – 1.0).
+  // Flip it for legitimate results so confidence always reflects
+  // how sure the model is about its own prediction.
+  const rawProb = isPhishing ? data.confidence : (1 - data.confidence);
+
+  // Snap to nearest 10% increment (0, 10, 20 … 100).
+  // Minimum display is 10% so we never show "0% confidence".
+  const snapped = Math.max(10, Math.round(rawProb * 10) * 10);
+
   return {
-    isPhishing: data.label === "phishing",
-    confidence: Math.round(data.confidence * 100),
+    isPhishing,
+    confidence: snapped,
     reasons: []
   };
 }
